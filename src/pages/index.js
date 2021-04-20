@@ -1,29 +1,63 @@
 import * as React from "react"
-import { Link } from "gatsby"
-import { StaticImage } from "gatsby-plugin-image"
 
 import Layout from "../components/layout"
-import SEO from "../components/seo"
+import Seo from "../components/seo"
+import PostCard from "../components/post-card.js"
 
-const IndexPage = () => (
-  <Layout>
-    <SEO title="Home" />
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <StaticImage
-      src="../images/gatsby-astronaut.png"
-      width={300}
-      quality={95}
-      formats={["AUTO", "WEBP", "AVIF"]}
-      alt="A Gatsby astronaut"
-      style={{ marginBottom: `1.45rem` }}
-    />
-    <p>
-      <Link to="/page-2/">Go to page 2</Link> <br />
-      <Link to="/using-typescript/">Go to "Using TypeScript"</Link>
-    </p>
-  </Layout>
-)
+import { useStaticQuery, graphql } from "gatsby"
+import { Hero, Container, Columns } from "react-bulma-components"
+
+const IndexPage = () => {
+  const data = useStaticQuery(graphql`
+    query PostCardQuery {
+      allMarkdownRemark(
+        filter: { frontmatter: { postOnHome: { eq: true } } }
+        sort: { fields: [frontmatter___date], order: DESC }
+      ) {
+        nodes {
+          frontmatter {
+            date(formatString: "MMMM DD, YYYY")
+            author
+            slug
+            title
+            postOnHome
+            grabberText
+            featuredImage {
+              childImageSharp {
+                gatsbyImageData(aspectRatio: 1.77777777778, layout: CONSTRAINED)
+              }
+            }
+            featuredImageAlt
+            pdfFile {
+              publicURL
+            }
+          }
+          html
+        }
+      }
+    }
+  `)
+
+  const posts = data.allMarkdownRemark.nodes
+
+  return (
+    <Layout>
+      <Seo title="Home" />
+      <Hero>
+        <Hero.Body>
+          <Container multiline>
+            <Columns>
+              {posts.map(post => (
+                <Columns.Column size="one-third" key={post.frontmatter.slug}>
+                  <PostCard post={post} />
+                </Columns.Column>
+              ))}
+            </Columns>
+          </Container>
+        </Hero.Body>
+      </Hero>
+    </Layout>
+  )
+}
 
 export default IndexPage
