@@ -14,7 +14,7 @@ const Contact = () => (
           <Content>
             <div className="block">
               <h1>Contact Us</h1>
-              For all inqueries, please contact the tournament organizer:
+              For all inquiries, please contact the tournament organizer:
             </div>
             <div className="block">
               <Box className="is-inline-block">
